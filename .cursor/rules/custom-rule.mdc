@@ -1,0 +1,46 @@
+---
+alwaysApply: true
+---
+
+# MCP Server Development Standards
+
+All generated code MUST exclusively use the high-level `McpServer` class and its builder methods, defining all schemas using Zod and adhering to modern ECMAScript Modules (ESM) syntax.
+
+## Latest Syntax 
+use syntaxes only from "@modelcontextprotocol/sdk": "^1.20.0",
+
+## Core Principles
+
+1.  **ESM Syntax**: All imports MUST use ESM syntax with `.js` extensions for local file imports (e.g., `import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'`).
+
+2.  **Schema Shorthand**: Use the MCP SDK shorthand for schema definitions. The SDK automatically wraps the plain object in `z.object()`.
+    ```typescript
+    // ✅ Correct
+    inputSchema: { name: z.string() }
+
+    // ❌ Incorrect
+    inputSchema: z.object({ name: z.string() })
+    ```
+
+3.  **Builder Methods**: Use `server.registerTool()`, `server.registerResource()`, and `server.registerPrompt()` for all registrations.
+
+4.  **Zod Best Practices**:
+    - Use `.describe()` for documentation.
+    - Use `.optional()`, `.default()` for field modifiers.
+    - Leverage built-in validators (`.email()`, `.min()`, etc.).
+
+5.  **Return Pattern**: Tool handlers MUST return both `content` (for text representation) and `structuredContent` (for type-safe output).
+    ```typescript
+    return {
+      content: [{ type: 'text', text: JSON.stringify(output) }],
+      structuredContent: output
+    };
+    ```
+
+## Prohibited Patterns
+
+- DO NOT use the low-level `Server` class directly.
+- DO NOT use manual request handlers (`setRequestHandler`).
+- DO NOT wrap top-level schemas in `z.object()`.
+- DO NOT use CommonJS (`require`, `module.exports`).
+- DO NOT omit `.js` extensions in local file imports.
